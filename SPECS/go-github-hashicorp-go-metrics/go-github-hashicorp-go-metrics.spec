@@ -15,14 +15,14 @@
     %{go_import_path}/prometheus
 }
 
-Name:           go-github-armon-go-metrics
+Name:           go-github-hashicorp-go-metrics
 Version:        0.7.0
 Release:        %autorelease
 Summary:        Metrics instrumentation library for Go
 License:        MIT
-URL:            https://github.com/armon/go-metrics
+URL:            https://github.com/hashicorp/go-metrics
 #!RemoteAsset:  sha256:cfa7c21e9ae96332435c2559e80b8041fc926a53aa53e263c6d0d32df263719e
-Source0:        https://github.com/armon/go-metrics/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
+Source0:        https://github.com/hashicorp/go-metrics/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
 
@@ -50,6 +50,9 @@ BuildRequires:  go(google.golang.org/protobuf)
 
 Provides:       go(github.com/armon/go-metrics) = %{version}
 Provides:       go(github.com/hashicorp/go-metrics) = %{version}
+Provides:       go-github-armon-go-metrics = %{version}-%{release}
+
+Obsoletes:      go-github-armon-go-metrics
 
 Requires:       go(github.com/DataDog/datadog-go)
 Requires:       go(github.com/beorn7/perks)
@@ -75,11 +78,10 @@ This library provides a metrics package which can be used to instrument
 code, expose application metrics, and profile runtime performance in a
 flexible manner.
 
-# Upstream v0.7.0 declares module github.com/hashicorp/go-metrics while the
-# source archive still comes from github.com/armon/go-metrics. Install a
-# compatibility copy for consumers that still import the old path. The check
-# section is left to the golangmodules default: no package in the module
-# imports the old path anymore.
+# Upstream moved from github.com/armon/go-metrics to
+# github.com/hashicorp/go-metrics at v0.5.0. Install a compatibility copy for
+# consumers that still import the old path. The check section is left to the
+# golangmodules default: no package in the module imports the old path anymore.
 %install -a
 mkdir -p %{buildroot}%{go_sys_gopath}/$(dirname %{go_compat_import_path})
 cp -a %{buildroot}%{go_sys_gopath}/%{go_import_path} \
