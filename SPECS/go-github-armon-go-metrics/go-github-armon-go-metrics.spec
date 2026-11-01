@@ -16,12 +16,12 @@
 }
 
 Name:           go-github-armon-go-metrics
-Version:        0.6.1
+Version:        0.7.0
 Release:        %autorelease
 Summary:        Metrics instrumentation library for Go
 License:        MIT
 URL:            https://github.com/armon/go-metrics
-#!RemoteAsset:  sha256:6c854e114356093864f23a9e37aef1464d8437c812215133489d16909f1ac8fc
+#!RemoteAsset:  sha256:cfa7c21e9ae96332435c2559e80b8041fc926a53aa53e263c6d0d32df263719e
 Source0:        https://github.com/armon/go-metrics/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
@@ -33,7 +33,6 @@ BuildRequires:  go(github.com/beorn7/perks)
 BuildRequires:  go(github.com/cespare/xxhash/v2)
 BuildRequires:  go(github.com/circonus-labs/circonus-gometrics)
 BuildRequires:  go(github.com/circonus-labs/circonusllhist)
-BuildRequires:  go(github.com/golang/protobuf)
 BuildRequires:  go(github.com/hashicorp/go-cleanhttp)
 BuildRequires:  go(github.com/hashicorp/go-immutable-radix)
 BuildRequires:  go(github.com/hashicorp/go-retryablehttp)
@@ -57,7 +56,6 @@ Requires:       go(github.com/beorn7/perks)
 Requires:       go(github.com/cespare/xxhash/v2)
 Requires:       go(github.com/circonus-labs/circonus-gometrics)
 Requires:       go(github.com/circonus-labs/circonusllhist)
-Requires:       go(github.com/golang/protobuf)
 Requires:       go(github.com/hashicorp/go-cleanhttp)
 Requires:       go(github.com/hashicorp/go-immutable-radix)
 Requires:       go(github.com/hashicorp/go-retryablehttp)
@@ -77,35 +75,15 @@ This library provides a metrics package which can be used to instrument
 code, expose application metrics, and profile runtime performance in a
 flexible manner.
 
-# Upstream v0.5.4 declares module github.com/hashicorp/go-metrics while the
+# Upstream v0.7.0 declares module github.com/hashicorp/go-metrics while the
 # source archive still comes from github.com/armon/go-metrics. Install a
-# compatibility copy for consumers that still import the old path.
+# compatibility copy for consumers that still import the old path. The check
+# section is left to the golangmodules default: no package in the module
+# imports the old path anymore.
 %install -a
 mkdir -p %{buildroot}%{go_sys_gopath}/$(dirname %{go_compat_import_path})
 cp -a %{buildroot}%{go_sys_gopath}/%{go_import_path} \
       %{buildroot}%{go_sys_gopath}/%{go_compat_import_path}
-
-# The default golangmodules check only copies %{go_import_path} into the
-# temporary GOPATH. This module's compat packages import the old
-# github.com/armon/go-metrics path, so copy both paths before running tests.
-# Run the Datadog sink and compat packages that do not need excluded sinks or
-# OBS local socket behavior; this mirrors go_test_exclude for the custom check.
-# - HNO3Miracle
-%check
-export GO111MODULE=off
-export GOPATH=%{_builddir}/go:%{_datadir}/gocode
-mkdir -p %{_builddir}/go/src/$(dirname %{go_import_path})
-rm -rf %{_builddir}/go/src/%{go_import_path}
-cp -a . %{_builddir}/go/src/%{go_import_path}
-mkdir -p %{_builddir}/go/src/$(dirname %{go_compat_import_path})
-cp -a %{_builddir}/go/src/%{go_import_path} \
-      %{_builddir}/go/src/%{go_compat_import_path}
-cd %{_builddir}/go/src/%{go_import_path}
-go test -v \
-    %{go_import_path}/datadog \
-    %{go_import_path}/compat/circonus \
-    %{go_import_path}/compat/datadog \
-    %{go_import_path}/compat/prometheus
 
 %files
 %doc README.md
